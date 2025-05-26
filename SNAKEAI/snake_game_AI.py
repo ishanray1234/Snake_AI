@@ -3,6 +3,7 @@ import random
 from enum import Enum
 from collections import namedtuple
 import numpy as np
+from math import log
 
 pygame.init()
 
@@ -15,7 +16,7 @@ class Direction(Enum):
 Point = namedtuple('Point', 'x, y')
 
 BLOCK_SIZE = 20
-SPEED = 10  # Speed of the snake, higher is faster
+SPEED = 50000  # Speed of the snake, higher is faster
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE1 = (0, 0, 255)
@@ -69,11 +70,17 @@ class SnakeGameAI:
         if self.is_collision() or self.frame_iteration > 100*len(self.snake_body):
             game_over = True
             reward = -10
+            # distance reward = At time step t, we denote the snake’s lengthas Ltand denote the distance between the target and the headof the snake as Dt.
+            # log((len(self.snake_body) + sqrt(self.food.x - self.snake_head.x)**2 + (self.food.y - self.snake_head.y)**2)/(len(self.snake_body) + sqrt(self.food.x - self.snake_body[0].x)**2 + (self.food.y - self.snake_body[0].y)**2))
+            # reward = log((len(self.snake_body) + np.sqrt((self.food.x - self.snake_head.x)**2 + (self.food.y - self.snake_head.y)**2)) /
+            #             (len(self.snake_body) + np.sqrt((self.food.x - self.snake_body[0].x)**2 + (self.food.y - self.snake_body[0].y)**2)), 2)
             return reward, game_over, self.score
 
         # place the food
         if self.snake_head == self.food:
-            reward = 10
+            reward = 10  # reward for eating food
+            # reward = log((len(self.snake_body) + np.sqrt((self.food.x - self.snake_head.x)**2 + (self.food.y - self.snake_head.y)**2)) /
+            #             (len(self.snake_body) + np.sqrt((self.food.x - self.snake_body[0].x)**2 + (self.food.y - self.snake_body[0].y)**2)), 2)
             self.score += 1
             self.place_food()
         else:
